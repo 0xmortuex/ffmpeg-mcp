@@ -160,7 +160,7 @@ def _run_one(
         on_progress((index + frac) / count)
 
     out_reader = _Reader(proc.stdout, handle_progress)
-    err_reader = _Reader(proc.stderr, err_tail.append)
+    err_reader = _Reader(proc.stderr, lambda ln: err_tail.append(ln[-400:]))  # cap a runaway line
     out_reader.start()
     err_reader.start()
     try:

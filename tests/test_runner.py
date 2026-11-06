@@ -176,3 +176,10 @@ def test_quoted_windows_command_round_trips_through_powershell(tmp_path: Path) -
     )
     assert out.returncode == 0, out.stderr
     assert out.stdout.strip() == repr([str(weird), "a;b"])
+
+
+def test_one_enormous_stderr_line_does_not_flood_the_error() -> None:
+    script = "import sys; sys.stderr.write('x' * 2_000_000); sys.exit(1)"
+    with pytest.raises(MediaError) as err:
+        run_steps([Step([sys.executable, "-c", script])], timeout_s=30)
+    assert len(str(err.value)) < 1000
