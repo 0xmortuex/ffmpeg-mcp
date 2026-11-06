@@ -34,7 +34,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       # Tests generate real media and run real ffmpeg (libx264, libvpx-vp9, libopus, libmp3lame).
-      - uses: FedericoCarboni/setup-ffmpeg@v3
+      - name: Install ffmpeg
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Linux) sudo apt-get update && sudo apt-get install -y ffmpeg ;;
+            macOS) brew install ffmpeg ;;
+            Windows) choco install ffmpeg -y --no-progress ;;
+          esac
+          ffmpeg -version | head -1
       - run: pip install "ruff==0.16.0" "mypy==2.3.0" ".[test]"
       - run: ruff check src tests
       - run: mypy --strict src

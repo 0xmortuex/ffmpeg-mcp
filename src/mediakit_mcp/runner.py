@@ -96,13 +96,13 @@ class _Reader(threading.Thread):
     def __init__(self, stream: IO[str], handle: Callable[[str], None]) -> None:
         super().__init__(daemon=True)
         self._stream = stream
-        self._handle = handle
+        self._on_line = handle
         self.error: BaseException | None = None
 
     def run(self) -> None:
         try:
             for line in self._stream:
-                self._handle(line)
+                self._on_line(line)
         except BaseException as e:  # reported by the caller, not swallowed
             self.error = e
 
